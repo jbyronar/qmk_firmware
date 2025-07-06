@@ -16,16 +16,20 @@
 #include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
+#    include "is31fl3741.h"
+#endif
 
-const is31fl3741_led_t PROGMEM g_is31fl3741_leds[IS31FL3741_LED_COUNT] = {
-    {0, SW1_CS6, SW1_CS5, SW1_CS4},
-    {0, SW2_CS6, SW2_CS5, SW2_CS4},
-    {0, SW3_CS6, SW3_CS5, SW3_CS4},
-    {0, SW4_CS6, SW4_CS5, SW4_CS4},
-    {0, SW5_CS6, SW5_CS5, SW5_CS4},
-    {0, SW6_CS6, SW6_CS5, SW6_CS4},
-    {0, SW7_CS6, SW7_CS5, SW7_CS4},
-    {0, SW8_CS6, SW8_CS5, SW8_CS4},
+#ifdef RGB_MATRIX_ENABLE
+
+const is31fl3741_led_t g_is31fl3741_leds[RGB_MATRIX_LED_COUNT] = {
+    {0, SW6_CS1, SW5_CS1, SW4_CS1},
+    {0, SW6_CS2, SW5_CS2, SW4_CS2},
+    {0, SW6_CS3, SW5_CS3, SW4_CS3},
+    {0, SW6_CS4, SW5_CS4, SW4_CS4},
+    {0, SW6_CS5, SW5_CS5, SW4_CS5},
+    {0, SW6_CS6, SW5_CS6, SW4_CS6},
+    {0, SW6_CS7, SW5_CS7, SW4_CS7},
+    {0, SW6_CS8, SW5_CS8, SW4_CS8},
     {0, SW1_CS18, SW1_CS17, SW1_CS16},
     {0, SW2_CS18, SW2_CS17, SW2_CS16},
     {0, SW3_CS18, SW3_CS17, SW3_CS16},
@@ -34,14 +38,14 @@ const is31fl3741_led_t PROGMEM g_is31fl3741_leds[IS31FL3741_LED_COUNT] = {
     {0, SW6_CS18, SW6_CS17, SW6_CS16},
     {0, SW7_CS18, SW7_CS17, SW7_CS16},
 
-    {0, SW1_CS9, SW1_CS8, SW1_CS7},
-    {0, SW2_CS9, SW2_CS8, SW2_CS7},
-    {0, SW3_CS9, SW3_CS8, SW3_CS7},
-    {0, SW4_CS9, SW4_CS8, SW4_CS7},
-    {0, SW5_CS9, SW5_CS8, SW5_CS7},
-    {0, SW6_CS9, SW6_CS8, SW6_CS7},
-    {0, SW7_CS9, SW7_CS8, SW7_CS7},
-    {0, SW8_CS9, SW8_CS8, SW8_CS7},
+    {0, SW9_CS1, SW8_CS1, SW7_CS1},
+    {0, SW9_CS2, SW8_CS2, SW7_CS2},
+    {0, SW9_CS3, SW8_CS3, SW7_CS3},
+    {0, SW9_CS4, SW8_CS4, SW7_CS4},
+    {0, SW9_CS5, SW8_CS5, SW7_CS5},
+    {0, SW9_CS6, SW8_CS6, SW7_CS6},
+    {0, SW9_CS7, SW8_CS7, SW7_CS7},
+    {0, SW9_CS8, SW8_CS8, SW7_CS8},
     {0, SW1_CS21, SW1_CS20, SW1_CS19},
     {0, SW2_CS21, SW2_CS20, SW2_CS19},
     {0, SW3_CS21, SW3_CS20, SW3_CS19},
@@ -80,10 +84,10 @@ const is31fl3741_led_t PROGMEM g_is31fl3741_leds[IS31FL3741_LED_COUNT] = {
     {0, SW6_CS27, SW6_CS26, SW6_CS25},
     {0, SW7_CS27, SW7_CS26, SW7_CS25},
 
-    {0, SW1_CS3, SW1_CS2, SW1_CS1},
-    {0, SW2_CS3, SW2_CS2, SW2_CS1},
-    {0, SW3_CS3, SW3_CS2, SW3_CS1},
-    {0, SW7_CS3, SW7_CS2, SW7_CS1},
+    {0, SW3_CS1, SW2_CS1, SW1_CS1},
+    {0, SW3_CS2, SW2_CS2, SW1_CS2},
+    {0, SW3_CS3, SW2_CS3, SW1_CS3},
+    {0, SW3_CS7, SW2_CS7, SW1_CS7},
     {0, SW2_CS30, SW2_CS29, SW2_CS28},
     {0, SW3_CS30, SW3_CS29, SW3_CS28},
     {0, SW4_CS30, SW4_CS29, SW4_CS28},
@@ -112,6 +116,59 @@ led_config_t g_led_config = { {
     1, 1, 1, 4, 1, 1, 1, 1, 1, 1
 } };
 
+bool rgb_matrix_indicators_user(void){
+    switch(biton32(layer_state)){
+        case 1:
+             rgb_matrix_set_color(1, 0x00, 0xFF, 0x00);
+             rgb_matrix_set_color(14, 0xDC, 0x14, 0x3C);
+             rgb_matrix_set_color(47, 0xFF, 0xD7, 0x0);
+             rgb_matrix_set_color(34, 0xFF, 0xD7, 0x0);
+
+            for (uint8_t i = 2; i < 13; i++) {
+                //RGB_MATRIX_TEST_LED_FLAGS();
+                rgb_matrix_set_color(i, 0x00, 0xFF, 0xFF);
+            };
+
+            rgb_matrix_set_color(40, 0xD2, 0x69, 0xE1);
+            rgb_matrix_set_color(41, 0xD2, 0x69, 0xE1);
+            rgb_matrix_set_color(63, 0xFF, 0x45, 0x00);
+
+            //Volumen
+            rgb_matrix_set_color(56, 0x8B, 0x00, 0x00);
+            rgb_matrix_set_color(66, 0x8B, 0x00, 0x00);
+            rgb_matrix_set_color(67, 0x8B, 0x00, 0x00);
+
+            //Pagos
+            rgb_matrix_set_color(22, 0x00, 0xFF, 0x00);
+            break;
+
+        default:
+            rgb_matrix_set_color(63, 0x2C, 0x3E, 0x50);//FN
+            rgb_matrix_set_color(50, 0x80, 0x80, 0x00);//N
+            rgb_matrix_set_color(43, 0x00, 0xFF, 0x00);//PGUP
+            rgb_matrix_set_color(2, 0x00, 0x00, 0x80);
+            rgb_matrix_set_color(47, 0x80, 0x00, 0x00);//C
+            rgb_matrix_set_color(48, 0x80, 0x00, 0x00);//V
+            rgb_matrix_set_color(45, 0x00, 0x80, 0x00);//Z
+            rgb_matrix_set_color(32, 0x80, 0x00, 0x80);//S
+            rgb_matrix_set_color(18, 0x80, 0x80, 0x00);//E
+            rgb_matrix_set_color(46, 0x00, 0x00, 0x80);//X
+            rgb_matrix_set_color(12, 0xFF, 0x45, 0x00);//=
+            rgb_matrix_set_color(40, 0x00, 0xFF, 0xFF);//;
+            rgb_matrix_set_color(0, 0xEB, 0xF5, 0xFB);//ESC
+            rgb_matrix_set_color(61, 0xEB, 0xF5, 0xFB);//SPC
+            rgb_matrix_set_color(44, 0xFF, 0x45, 0x00);//LSHIFT
+            rgb_matrix_set_color(31, 0x80, 0x00, 0x80);//A
+            rgb_matrix_set_color(33, 0x80, 0x00, 0x80);//D
+            rgb_matrix_set_color(17, 0x80, 0x00, 0x80);//W
+            rgb_matrix_set_color(15, 0x00, 0xFF, 0xFF);//W
+
+
+            break;
+    }
+    return true;
+}
+
 
 bool rgb_matrix_indicators_kb(void) {
     if (!rgb_matrix_indicators_user()) {
@@ -122,4 +179,5 @@ bool rgb_matrix_indicators_kb(void) {
     }
     return true;
 }
+
 #endif
