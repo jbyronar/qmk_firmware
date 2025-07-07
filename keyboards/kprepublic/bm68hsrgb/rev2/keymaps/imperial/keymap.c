@@ -18,6 +18,9 @@
 #define _BASE 0
 #define _FUNCTIONS 1
 
+#define TAPPING_TERM 200
+#define TAPPING_TERM_PER_KEY
+
 uint8_t rgbmode;
 static void setGameRGB(int);
 bool rgbStatus = true;
@@ -41,6 +44,11 @@ void setGameRGB(int n) {
   }
 };
 
+enum {
+    TD_C = 0,
+    TD_V
+};
+
 enum my_keycodes {
     RMT = SAFE_RANGE,
     RMS,
@@ -49,8 +57,55 @@ enum my_keycodes {
     RMIS,
     RMDS,
     RMIV,
-    RMDV,
-    Prueba
+    RMDV
+};
+
+void td_C (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_C);
+  } else {
+    SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_C));
+    clear_keyboard();
+  }
+}
+
+void td_V(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        register_code(KC_V);
+    } else {
+        if (keymap_config.swap_lctl_lgui) {
+            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_V));
+        } else {
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_V));
+        }
+        clear_keyboard();
+    }
+}
+
+void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    unregister_code (KC_N);
+    unregister_code (KC_PGUP);
+    unregister_code (KC_2);
+    unregister_code (KC_C);
+    unregister_code (KC_V);
+    unregister_code (KC_Z);
+    unregister_code (KC_S);
+    unregister_code (KC_X);
+    unregister_code (KC_EQL);
+    unregister_code (KC_SCLN);
+    unregister_code (KC_ESC);
+    unregister_code (KC_TAB);
+    unregister_code (KC_1);
+
+    reset_tap_dance(state);
+  }
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_C]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_C, dance_cln_reset),
+    [TD_V]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_V, dance_cln_reset),
+
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -95,11 +150,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       {rgb_matrix_decrease_val();
       }
       return true;
-      case Prueba:
-      if (record->event.pressed)
-      {rgb_matrix_decrease_val();
-      }
-      return true;
       default:
       return true;
   }
@@ -118,10 +168,10 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(10, 0x87, 0xCE, 0xEB);
         rgb_matrix_set_color(11, 0x87, 0xCE, 0xEB);
         rgb_matrix_set_color(12, 0x87, 0xCE, 0xEB);
-        
+
         rgb_matrix_set_color(13, 0xFF, 0x45, 0x00);
         rgb_matrix_set_color(14, 0xFF, 0x00, 0x00);
-        
+
         rgb_matrix_set_color(16, 0x00, 0xFF, 0x00);
         rgb_matrix_set_color(17, 0x00, 0xFF, 0x00);
         rgb_matrix_set_color(18, 0xFF, 0xD7, 0x00);
@@ -132,7 +182,7 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(23, 0xFF, 0xD7, 0x00);
         rgb_matrix_set_color(24, 0xFF, 0xD7, 0x00);
         rgb_matrix_set_color(25, 0xFF, 0xD7, 0x00);
-        
+
         rgb_matrix_set_color(31, 0xFF, 0x00, 0xFF);
         rgb_matrix_set_color(32, 0xFF, 0x00, 0xFF);
         rgb_matrix_set_color(33, 0xFF, 0x00, 0xFF);
@@ -141,12 +191,15 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(36, 0xFF, 0x00, 0xFF);
         rgb_matrix_set_color(37, 0xFF, 0x00, 0xFF);
         rgb_matrix_set_color(38, 0xFF, 0x00, 0xFF);
-        
+
         rgb_matrix_set_color(50, 0x00, 0x80, 0xFF);
-        
+
         rgb_matrix_set_color(56, 0x80, 0x80, 0x80);
         rgb_matrix_set_color(63, 0xFF, 0x45, 0x00);
         rgb_matrix_set_color(67, 0x80, 0x80, 0x80);
+    } else {
+        rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);
+        rgb_matrix_set_color(48, 0xFF, 0x00, 0xFF);
     }
     return true;
 }
@@ -173,14 +226,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         QK_GESC,        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
         KC_CAPS,        KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
-        KC_LSFT,                 KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
+        KC_LSFT,                 KC_Z,    KC_X,    TD(TD_C), TD(TD_V), KC_B, KC_N, KC_M, KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
         KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [1] = LAYOUT_65_ansi(
         QK_GESC,        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
         _______,        RGB_TOG, RGB_MOD, RGB_HUI, RGB_HUD, RGB_SAI, RGB_SAD, RGB_VAI, RGB_VAD, RGB_SPI, RGB_SPD, _______, _______, _______, _______,
         KC_CAPS,        RMT,     RMS,     RMIH,    RMDH,    RMIS,    RMDS,    RMIV,    RMDV,    _______, _______,  _______,         _______, _______,
-        Prueba,                 _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
+        _______,                _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
         _______,        _______, _______,                            _______,                   _______, TG(1),   _______, _______, KC_VOLD, _______
     ),
     [2] = LAYOUT_65_ansi(
