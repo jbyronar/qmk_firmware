@@ -18,6 +18,11 @@
 
 enum {
     TD_C = 0,
+    TD_V,
+    TD_Z,
+    TD_A,
+    TD_S,
+    TD_X
 };
 
 bool is_mac_os(void) {
@@ -37,14 +42,84 @@ void td_C (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_V (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_V);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(G(KC_V));  // Mac: Cmd+V
+    } else {
+      tap_code16(C(KC_V));  // Windows: Ctrl+V
+    }
+  }
+}
+
+void td_Z (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_Z);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(G(KC_Z));  // Mac: Cmd+Z
+    } else {
+      tap_code16(C(KC_Z));  // Windows: Ctrl+Z
+    }
+  }
+}
+
+void td_A (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_A);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(G(KC_A));  // Mac: Cmd+A
+    } else {
+      tap_code16(C(KC_A));  // Windows: Ctrl+A
+    }
+  }
+}
+
+void td_S (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_S);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(G(KC_S));  // Mac: Cmd+S
+    } else {
+      tap_code16(C(KC_S));  // Windows: Ctrl+S
+    }
+  }
+}
+
+void td_X (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_X);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(G(KC_X));  // Mac: Cmd+X
+    } else {
+      tap_code16(C(KC_X));  // Windows: Ctrl+X
+    }
+  }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
+    unregister_code (KC_V);
+    unregister_code (KC_Z);
+    unregister_code (KC_A);
+    unregister_code (KC_S);
+    unregister_code (KC_X);
   }
 }
 
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_C]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_C, dance_cln_reset)
+    [TD_C]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_C, dance_cln_reset),
+    [TD_V]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_V, dance_cln_reset),
+    [TD_Z]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_Z, dance_cln_reset),
+    [TD_A]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_A, dance_cln_reset),
+    [TD_S]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_S, dance_cln_reset),
+    [TD_X]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_X, dance_cln_reset)
 };
 
 
@@ -54,8 +129,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi(
         QK_GESC,        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
-        KC_CAPS,        KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
-        KC_LSFT,                 KC_Z,    KC_X,   TD(TD_C), KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
+        KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
+        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
         KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, MO(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [1] = LAYOUT_65_ansi(
