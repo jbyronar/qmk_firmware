@@ -34,6 +34,10 @@ void setGameRGB(int n) {
         if(!rgbmode) rgbmode = rgb_matrix_config.mode;
         rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     break;
+    case 5:
+        if(!rgbmode) rgbmode = rgb_matrix_config.mode;
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+    break;
   }
 };
 
@@ -100,6 +104,53 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return true;
   }
 }
+bool rgb_matrix_indicators_user(void) {
+    if (biton32(layer_state) == _FUNCTIONS) {
+        rgb_matrix_set_color(1, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(2, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(3, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(4, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(5, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(6, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(7, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(8, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(9, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(10, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(11, 0x87, 0xCE, 0xEB);
+        rgb_matrix_set_color(12, 0x87, 0xCE, 0xEB);
+        
+        rgb_matrix_set_color(13, 0xFF, 0x45, 0x00);
+        rgb_matrix_set_color(14, 0xFF, 0x00, 0x00);
+        
+        rgb_matrix_set_color(16, 0x00, 0xFF, 0x00);
+        rgb_matrix_set_color(17, 0x00, 0xFF, 0x00);
+        rgb_matrix_set_color(18, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(19, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(20, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(21, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(22, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(23, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(24, 0xFF, 0xD7, 0x00);
+        rgb_matrix_set_color(25, 0xFF, 0xD7, 0x00);
+        
+        rgb_matrix_set_color(31, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(32, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(33, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(34, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(35, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(36, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(37, 0xFF, 0x00, 0xFF);
+        rgb_matrix_set_color(38, 0xFF, 0x00, 0xFF);
+        
+        rgb_matrix_set_color(50, 0x00, 0x80, 0xFF);
+        
+        rgb_matrix_set_color(56, 0x80, 0x80, 0x80);
+        rgb_matrix_set_color(63, 0xFF, 0x45, 0x00);
+        rgb_matrix_set_color(67, 0x80, 0x80, 0x80);
+    }
+    return true;
+}
+
 layer_state_t layer_state_set_user(layer_state_t state) {
   uint8_t layer = biton32(state);
   switch (layer) {
