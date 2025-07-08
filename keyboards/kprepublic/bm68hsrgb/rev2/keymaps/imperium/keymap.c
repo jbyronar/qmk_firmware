@@ -16,6 +16,28 @@
 #include QMK_KEYBOARD_H
 #include "os_detection.h"
 
+enum my_keycodes {
+    Pass = SAFE_RANGE,
+    WhiteEffect
+};
+
+static void handleBoot(void);
+static uint32_t key_timer_boot = 0;
+uint32_t tiempo_boot = 0;
+bool is_boot_active = false;
+
+void handleBoot(){
+    is_boot_active = !is_boot_active;
+    if(is_boot_active){
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);
+        tiempo_boot = 60000; // 1 minuto
+    }else{
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
+        rgb_matrix_set_speed_noeeprom(50); // Velocidad más lenta para respiración
+        tiempo_boot = 0;
+    }
+}
+
 enum {
     TD_C = 0,
     TD_V,
@@ -26,7 +48,8 @@ enum {
     TD_UP,
     TD_DOWN,
     TD_LEFT,
-    TD_RIGHT
+    TD_RIGHT,
+    TD_ESC
 };
 
 bool is_mac_os(void) {
@@ -154,6 +177,14 @@ void td_RIGHT (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_ESC (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_ESC);
+  } else {
+    handleBoot();
+  }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -166,6 +197,7 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_DOWN);
     unregister_code (KC_LEFT);
     unregister_code (KC_RIGHT);
+    unregister_code (KC_ESC);
   }
 }
 
@@ -179,14 +211,42 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_UP]    = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_UP, dance_cln_reset),
     [TD_DOWN]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_DOWN, dance_cln_reset),
     [TD_LEFT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LEFT, dance_cln_reset),
-    [TD_RIGHT] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RIGHT, dance_cln_reset)
+    [TD_RIGHT] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RIGHT, dance_cln_reset),
+    [TD_ESC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_ESC, dance_cln_reset)
 };
+
+void matrix_scan_user(void) {
+    if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
+        key_timer_boot = timer_read32();
+        if(is_boot_active){
+            SEND_STRING(SS_TAP(X_F13));
+        }
+    }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case Pass:
+            if (record->event.pressed) {
+                SEND_STRING("M1020320362r");
+            }
+            return false;
+        case WhiteEffect:
+            if (record->event.pressed) {
+                rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+                rgb_matrix_sethsv_noeeprom(0, 0, 255); // HSV para blanco sólido
+            }
+            return false;
+        default:
+            return true;
+    }
+}
 
 bool rgb_matrix_indicators_user(void) {
     if (get_highest_layer(layer_state) == 0) {
         // Tecla de control principal - ESC en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // ESC - Blanco
-        
+
         // Categoría: Edición de texto (shortcuts de productividad) - Cian
         rgb_matrix_set_color(31, 0x00, 0xFF, 0xFF);  // A (Seleccionar todo)
         rgb_matrix_set_color(32, 0x00, 0xFF, 0xFF);  // S (Guardar)
@@ -194,13 +254,13 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(46, 0x00, 0xFF, 0xFF);  // X (Cortar)
         rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C (Copiar)
         rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V (Pegar)
-        
+
         // Categoría: Navegación de escritorios - Naranja
         rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
         rgb_matrix_set_color(65, 0xFF, 0x80, 0x00);  // LEFT (Escritorio izquierdo)
         rgb_matrix_set_color(66, 0xFF, 0x80, 0x00);  // DOWN (App Windows/Show Desktop)
         rgb_matrix_set_color(67, 0xFF, 0x80, 0x00);  // RIGHT (Escritorio derecho)
-        
+
         // Categoría: Acceso a capas - Verde lima
         rgb_matrix_set_color(63, 0x80, 0xFF, 0x00);  // TG(1) - Acceso a capa de funciones
     } else if (get_highest_layer(layer_state) == 1) {
@@ -255,6 +315,12 @@ bool rgb_matrix_indicators_user(void) {
 
         // Tecla QK_BOOT en rojo (advertencia)
         rgb_matrix_set_color(14, 0xFF, 0x00, 0x00);  // QK_BOOT - Rojo
+
+        // Tecla Pass en magenta
+        rgb_matrix_set_color(43, 0xFF, 0x00, 0xFF);  // Pass - Magenta
+
+        // Barra espaciadora en blanco
+        rgb_matrix_set_color(61, 0xFF, 0xFF, 0xFF);  // Spacebar - Blanco
     } else if (get_highest_layer(layer_state) == 2) {
         // Capa 2 - Funciones de Mouse
 
@@ -294,7 +360,7 @@ bool rgb_matrix_indicators_user(void) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi(
-        QK_GESC,        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
+        TD(TD_ESC),     KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
         KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, TD(TD_UP), KC_END,
@@ -303,9 +369,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = LAYOUT_65_ansi(
         TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
         _______,        UG_TOGG, UG_NEXT, UG_HUEU, UG_HUED, UG_SATU, UG_SATD, UG_VALU, UG_VALD, UG_SPDU, UG_SPDD, _______, _______, _______, _______,
-        KC_CAPS,        RM_TOGG, RM_NEXT, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, _______, _______,  _______,         _______, _______,
+        KC_CAPS,        RM_TOGG, RM_NEXT, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, _______, _______,  _______,         _______, Pass,
         _______,                 _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
-        _______,        _______, _______,                            _______,                   _______, _______, TG(2),   _______, KC_VOLD, _______
+        _______,        _______, _______,                            WhiteEffect,               _______, _______, TG(2),   _______, KC_VOLD, _______
     ),
     [2] = LAYOUT_65_ansi(
         TO(0),          MS_ACL0, MS_ACL1, MS_ACL2, _______, _______, _______, _______, _______, _______, _______,  _______,  _______,  _______, _______,
