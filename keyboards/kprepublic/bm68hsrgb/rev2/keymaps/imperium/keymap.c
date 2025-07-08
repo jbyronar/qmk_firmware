@@ -22,7 +22,11 @@ enum {
     TD_Z,
     TD_A,
     TD_S,
-    TD_X
+    TD_X,
+    TD_UP,
+    TD_DOWN,
+    TD_LEFT,
+    TD_RIGHT
 };
 
 bool is_mac_os(void) {
@@ -102,6 +106,54 @@ void td_X (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_UP (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_UP);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(C(KC_UP));  // Mac: Control+Up (Mission Control)
+    } else {
+      tap_code16(G(KC_TAB));  // Windows: Win+Tab (Task View)
+    }
+  }
+}
+
+void td_DOWN (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_DOWN);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(C(KC_DOWN));  // Mac: Control+Down (Application Windows)
+    } else {
+      tap_code16(G(KC_D));  // Windows: Win+D (Show Desktop)
+    }
+  }
+}
+
+void td_LEFT (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_LEFT);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(C(KC_LEFT));  // Mac: Control+Left (Desktop Left)
+    } else {
+      tap_code16(C(G(KC_LEFT)));  // Windows: Ctrl+Win+Left (Desktop Left)
+    }
+  }
+}
+
+void td_RIGHT (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_RIGHT);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(C(KC_RIGHT));  // Mac: Control+Right (Desktop Right)
+    } else {
+      tap_code16(C(G(KC_RIGHT)));  // Windows: Ctrl+Win+Right (Desktop Right)
+    }
+  }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -110,30 +162,47 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_A);
     unregister_code (KC_S);
     unregister_code (KC_X);
+    unregister_code (KC_UP);
+    unregister_code (KC_DOWN);
+    unregister_code (KC_LEFT);
+    unregister_code (KC_RIGHT);
   }
 }
 
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_C]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_C, dance_cln_reset),
-    [TD_V]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_V, dance_cln_reset),
-    [TD_Z]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_Z, dance_cln_reset),
-    [TD_A]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_A, dance_cln_reset),
-    [TD_S]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_S, dance_cln_reset),
-    [TD_X]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_X, dance_cln_reset)
+    [TD_C]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_C, dance_cln_reset),
+    [TD_V]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_V, dance_cln_reset),
+    [TD_Z]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_Z, dance_cln_reset),
+    [TD_A]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_A, dance_cln_reset),
+    [TD_S]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_S, dance_cln_reset),
+    [TD_X]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_X, dance_cln_reset),
+    [TD_UP]    = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_UP, dance_cln_reset),
+    [TD_DOWN]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_DOWN, dance_cln_reset),
+    [TD_LEFT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LEFT, dance_cln_reset),
+    [TD_RIGHT] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RIGHT, dance_cln_reset)
 };
 
 bool rgb_matrix_indicators_user(void) {
     if (get_highest_layer(layer_state) == 0) {
-        // Iluminar tecla ESC en blanco
+        // Tecla de control principal - ESC en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // ESC - Blanco
-
-        // Iluminar teclas con tap dance en cian
-        rgb_matrix_set_color(31, 0x00, 0xFF, 0xFF);  // A
-        rgb_matrix_set_color(32, 0x00, 0xFF, 0xFF);  // S
-        rgb_matrix_set_color(45, 0x00, 0xFF, 0xFF);  // Z
-        rgb_matrix_set_color(46, 0x00, 0xFF, 0xFF);  // X
-        rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C
-        rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V
+        
+        // Categoría: Edición de texto (shortcuts de productividad) - Cian
+        rgb_matrix_set_color(31, 0x00, 0xFF, 0xFF);  // A (Seleccionar todo)
+        rgb_matrix_set_color(32, 0x00, 0xFF, 0xFF);  // S (Guardar)
+        rgb_matrix_set_color(45, 0x00, 0xFF, 0xFF);  // Z (Deshacer)
+        rgb_matrix_set_color(46, 0x00, 0xFF, 0xFF);  // X (Cortar)
+        rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C (Copiar)
+        rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V (Pegar)
+        
+        // Categoría: Navegación de escritorios - Naranja
+        rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
+        rgb_matrix_set_color(65, 0xFF, 0x80, 0x00);  // LEFT (Escritorio izquierdo)
+        rgb_matrix_set_color(66, 0xFF, 0x80, 0x00);  // DOWN (App Windows/Show Desktop)
+        rgb_matrix_set_color(67, 0xFF, 0x80, 0x00);  // RIGHT (Escritorio derecho)
+        
+        // Categoría: Acceso a capas - Verde lima
+        rgb_matrix_set_color(63, 0x80, 0xFF, 0x00);  // TG(1) - Acceso a capa de funciones
     } else if (get_highest_layer(layer_state) == 1) {
         // ESC para regresar a capa 0 en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // TO(0) - Blanco
@@ -228,8 +297,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         QK_GESC,        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
-        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
-        KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
+        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, TD(TD_UP), KC_END,
+        KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
     ),
     [1] = LAYOUT_65_ansi(
         TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
