@@ -70,7 +70,8 @@ enum {
     TD_RBRC,
     TD_MINS,
     TD_EQL,
-    TD_SPC
+    TD_SPC,
+    TD_N
 };
 
 bool is_mac_os(void) {
@@ -286,6 +287,18 @@ void td_SPC (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_N (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_N);
+  } else if (state->count == 2) {
+    SEND_STRING(SS_DOWN(X_RALT) SS_TAP(X_N));
+    clear_keyboard();
+  } else {
+    SEND_STRING(SS_TAP(X_SCLN));
+    clear_keyboard();
+  }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -309,6 +322,7 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_MINS);
     unregister_code (KC_EQL);
     unregister_code (KC_SPC);
+    unregister_code (KC_N);
   }
 }
 
@@ -333,7 +347,8 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_RBRC]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RBRC, dance_cln_reset),
     [TD_MINS]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_MINS, dance_cln_reset),
     [TD_EQL]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_EQL, dance_cln_reset),
-    [TD_SPC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SPC, dance_cln_reset)
+    [TD_SPC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SPC, dance_cln_reset),
+    [TD_N]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_N, dance_cln_reset)
 };
 
 void matrix_scan_user(void) {
@@ -399,6 +414,7 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(26, 0xFF, 0xFF, 0x00);  // ] (})
         rgb_matrix_set_color(11, 0xFF, 0xFF, 0x00);  // - (_)
         rgb_matrix_set_color(12, 0xFF, 0xFF, 0x00);  // = (+)
+        rgb_matrix_set_color(50, 0xFF, 0xFF, 0x00);  // N (Ñ)
 
         // Categoría: Navegación de escritorios - Naranja
         rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
@@ -472,6 +488,11 @@ bool rgb_matrix_indicators_user(void) {
 
         // Alt izquierdo en azul claro
         rgb_matrix_set_color(60, 0x80, 0xFF, 0xFF);  // Alt izquierdo - Azul claro
+
+        // Controles de media en verde
+        rgb_matrix_set_color(51, 0x00, 0xFF, 0x00);  // M (Previous) - Verde
+        rgb_matrix_set_color(52, 0x00, 0xFF, 0x00);  // , (Play/Pause) - Verde
+        rgb_matrix_set_color(53, 0x00, 0xFF, 0x00);  // . (Next) - Verde
     } else if (get_highest_layer(layer_state) == 2) {
         // Capa 2 - Funciones de Mouse
 
@@ -514,14 +535,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         TD(TD_ESC),     KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    TD(TD_MINS), TD(TD_EQL),  KC_BSPC, KC_HOME,
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD(TD_LBRC), TD(TD_RBRC), KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD(TD_SCLN), TD(TD_QUOT),          KC_ENT,  KC_PGDN,
-        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
+        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    TD(TD_N), KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
         KC_LCTL,        KC_LGUI, KC_LALT,                            TD(TD_SPC),                KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
     ),
     [1] = LAYOUT_65_ansi(
         TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
         _______,        UG_TOGG, UG_NEXT, UG_HUEU, UG_HUED, UG_SATU, UG_SATD, UG_VALU, UG_VALD, UG_SPDU, UG_SPDD, _______, _______, _______, _______,
         KC_CAPS,        RM_TOGG, RM_NEXT, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, _______, _______,  _______,         _______, Pass,
-        _______,                 _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
+        _______,                 _______, _______, _______, _______, _______, NK_TOGG, KC_MPRV, KC_MPLY, KC_MNXT, _______, _______, KC_VOLU, _______,
         _______,        _______, FractalEffect,                      WhiteEffect,               _______, _______, TG(2),   _______, KC_VOLD, _______
     ),
     [2] = LAYOUT_65_ansi(
