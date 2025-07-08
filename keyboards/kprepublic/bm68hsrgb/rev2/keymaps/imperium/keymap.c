@@ -16,6 +16,7 @@
 #include QMK_KEYBOARD_H
 #include "os_detection.h"
 
+
 enum my_keycodes {
     Pass = SAFE_RANGE,
     WhiteEffect,
@@ -290,12 +291,20 @@ void td_SPC (tap_dance_state_t *state, void *user_data) {
 void td_N (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     register_code (KC_N);
-  } else if (state->count == 2) {
-    SEND_STRING(SS_DOWN(X_RALT) SS_TAP(X_N));
-    clear_keyboard();
   } else {
-    SEND_STRING(SS_TAP(X_SCLN));
-    clear_keyboard();
+    // Método específico por OS para ñ
+    if (is_mac_os()) {
+      // Mac: Option + n, luego n = ñ
+      register_code(KC_LALT);  // Option en Mac
+      tap_code(KC_N);
+      unregister_code(KC_LALT);
+      tap_code(KC_N);
+    } else {
+      // Windows: Alt Gr + n = ñ (Layout Internacional)
+      register_code(KC_RALT);  // Alt Gr
+      tap_code(KC_N);
+      unregister_code(KC_RALT);
+    }
   }
 }
 
@@ -323,6 +332,10 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_EQL);
     unregister_code (KC_SPC);
     unregister_code (KC_N);
+    // Limpiar modificadores RALT específicamente
+    unregister_code (KC_RALT);
+    // Limpiar modificadores débiles para evitar interferencia
+    clear_weak_mods();
   }
 }
 
