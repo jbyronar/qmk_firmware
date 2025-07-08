@@ -122,6 +122,68 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_X]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_X, dance_cln_reset)
 };
 
+bool rgb_matrix_indicators_user(void) {
+    if (get_highest_layer(layer_state) == 0) {
+        // Iluminar tecla ESC en blanco
+        rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // ESC - Blanco
+        
+        // Iluminar teclas con tap dance en cian
+        rgb_matrix_set_color(31, 0x00, 0xFF, 0xFF);  // A
+        rgb_matrix_set_color(32, 0x00, 0xFF, 0xFF);  // S
+        rgb_matrix_set_color(45, 0x00, 0xFF, 0xFF);  // Z
+        rgb_matrix_set_color(46, 0x00, 0xFF, 0xFF);  // X
+        rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C
+        rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V
+    } else if (get_highest_layer(layer_state) == 1) {
+        // Teclas de función F1-F12 en verde
+        rgb_matrix_set_color(1, 0x00, 0xFF, 0x00);   // F1 - Verde
+        rgb_matrix_set_color(2, 0x00, 0xFF, 0x00);   // F2 - Verde
+        rgb_matrix_set_color(3, 0x00, 0xFF, 0x00);   // F3 - Verde
+        rgb_matrix_set_color(4, 0x00, 0xFF, 0x00);   // F4 - Verde
+        rgb_matrix_set_color(5, 0x00, 0xFF, 0x00);   // F5 - Verde
+        rgb_matrix_set_color(6, 0x00, 0xFF, 0x00);   // F6 - Verde
+        rgb_matrix_set_color(7, 0x00, 0xFF, 0x00);   // F7 - Verde
+        rgb_matrix_set_color(8, 0x00, 0xFF, 0x00);   // F8 - Verde
+        rgb_matrix_set_color(9, 0x00, 0xFF, 0x00);   // F9 - Verde
+        rgb_matrix_set_color(10, 0x00, 0xFF, 0x00);  // F10 - Verde
+        rgb_matrix_set_color(11, 0x00, 0xFF, 0x00);  // F11 - Verde
+        rgb_matrix_set_color(12, 0x00, 0xFF, 0x00);  // F12 - Verde
+        
+        // Teclas RGB Underglow en púrpura
+        rgb_matrix_set_color(16, 0x80, 0x00, 0xFF);  // UG_TOGG - Púrpura
+        rgb_matrix_set_color(17, 0x80, 0x00, 0xFF);  // UG_NEXT - Púrpura
+        rgb_matrix_set_color(18, 0x80, 0x00, 0xFF);  // UG_HUEU - Púrpura
+        rgb_matrix_set_color(19, 0x80, 0x00, 0xFF);  // UG_HUED - Púrpura
+        rgb_matrix_set_color(20, 0x80, 0x00, 0xFF);  // UG_SATU - Púrpura
+        rgb_matrix_set_color(21, 0x80, 0x00, 0xFF);  // UG_SATD - Púrpura
+        rgb_matrix_set_color(22, 0x80, 0x00, 0xFF);  // UG_VALU - Púrpura
+        rgb_matrix_set_color(23, 0x80, 0x00, 0xFF);  // UG_VALD - Púrpura
+        rgb_matrix_set_color(24, 0x80, 0x00, 0xFF);  // UG_SPDU - Púrpura
+        rgb_matrix_set_color(25, 0x80, 0x00, 0xFF);  // UG_SPDD - Púrpura
+        
+        // Teclas RGB Matrix en azul
+        rgb_matrix_set_color(31, 0x00, 0x80, 0xFF);  // RM_TOGG - Azul
+        rgb_matrix_set_color(32, 0x00, 0x80, 0xFF);  // RM_NEXT - Azul
+        rgb_matrix_set_color(33, 0x00, 0x80, 0xFF);  // RM_HUEU - Azul
+        rgb_matrix_set_color(34, 0x00, 0x80, 0xFF);  // RM_HUED - Azul
+        rgb_matrix_set_color(35, 0x00, 0x80, 0xFF);  // RM_SATU - Azul
+        rgb_matrix_set_color(36, 0x00, 0x80, 0xFF);  // RM_SATD - Azul
+        rgb_matrix_set_color(37, 0x00, 0x80, 0xFF);  // RM_VALU - Azul
+        rgb_matrix_set_color(38, 0x00, 0x80, 0xFF);  // RM_VALD - Azul
+        
+        // Teclas de volumen en amarillo
+        rgb_matrix_set_color(56, 0xFF, 0xFF, 0x00);  // KC_VOLU - Amarillo
+        rgb_matrix_set_color(66, 0xFF, 0xFF, 0x00);  // KC_VOLD - Amarillo
+        
+        // Tecla especial NK_TOGG en naranja
+        rgb_matrix_set_color(49, 0xFF, 0x80, 0x00);  // NK_TOGG - Naranja
+        
+        // Tecla QK_BOOT en rojo (advertencia)
+        rgb_matrix_set_color(14, 0xFF, 0x00, 0x00);  // QK_BOOT - Rojo
+    }
+    return true;
+}
+
 
 
 
@@ -131,7 +193,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
         KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_END,
-        KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, MO(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
+        KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [1] = LAYOUT_65_ansi(
         QK_GESC,        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
