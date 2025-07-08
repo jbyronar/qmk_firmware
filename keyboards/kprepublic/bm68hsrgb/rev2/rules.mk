@@ -9,4 +9,3 @@ AUDIO_ENABLE = no           # Audio output
 # Uncomment if needed for development
 #RGB_MATRIX_CUSTOM_USER = yes
 #KEY_OVERRIDE_ENABLE = yes
-
