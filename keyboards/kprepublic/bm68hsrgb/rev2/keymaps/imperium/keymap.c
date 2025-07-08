@@ -126,7 +126,7 @@ bool rgb_matrix_indicators_user(void) {
     if (get_highest_layer(layer_state) == 0) {
         // Iluminar tecla ESC en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // ESC - Blanco
-        
+
         // Iluminar teclas con tap dance en cian
         rgb_matrix_set_color(31, 0x00, 0xFF, 0xFF);  // A
         rgb_matrix_set_color(32, 0x00, 0xFF, 0xFF);  // S
@@ -135,6 +135,9 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C
         rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V
     } else if (get_highest_layer(layer_state) == 1) {
+        // ESC para regresar a capa 0 en blanco
+        rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // TO(0) - Blanco
+
         // Teclas de función F1-F12 en verde
         rgb_matrix_set_color(1, 0x00, 0xFF, 0x00);   // F1 - Verde
         rgb_matrix_set_color(2, 0x00, 0xFF, 0x00);   // F2 - Verde
@@ -148,7 +151,7 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(10, 0x00, 0xFF, 0x00);  // F10 - Verde
         rgb_matrix_set_color(11, 0x00, 0xFF, 0x00);  // F11 - Verde
         rgb_matrix_set_color(12, 0x00, 0xFF, 0x00);  // F12 - Verde
-        
+
         // Teclas RGB Underglow en púrpura
         rgb_matrix_set_color(16, 0x80, 0x00, 0xFF);  // UG_TOGG - Púrpura
         rgb_matrix_set_color(17, 0x80, 0x00, 0xFF);  // UG_NEXT - Púrpura
@@ -160,7 +163,7 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(23, 0x80, 0x00, 0xFF);  // UG_VALD - Púrpura
         rgb_matrix_set_color(24, 0x80, 0x00, 0xFF);  // UG_SPDU - Púrpura
         rgb_matrix_set_color(25, 0x80, 0x00, 0xFF);  // UG_SPDD - Púrpura
-        
+
         // Teclas RGB Matrix en azul
         rgb_matrix_set_color(31, 0x00, 0x80, 0xFF);  // RM_TOGG - Azul
         rgb_matrix_set_color(32, 0x00, 0x80, 0xFF);  // RM_NEXT - Azul
@@ -170,16 +173,49 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(36, 0x00, 0x80, 0xFF);  // RM_SATD - Azul
         rgb_matrix_set_color(37, 0x00, 0x80, 0xFF);  // RM_VALU - Azul
         rgb_matrix_set_color(38, 0x00, 0x80, 0xFF);  // RM_VALD - Azul
-        
+
         // Teclas de volumen en amarillo
         rgb_matrix_set_color(56, 0xFF, 0xFF, 0x00);  // KC_VOLU - Amarillo
         rgb_matrix_set_color(66, 0xFF, 0xFF, 0x00);  // KC_VOLD - Amarillo
-        
+
         // Tecla especial NK_TOGG en naranja
         rgb_matrix_set_color(49, 0xFF, 0x80, 0x00);  // NK_TOGG - Naranja
-        
+
+        // Tecla TG(2) para acceso a capa de mouse en verde lima
+        rgb_matrix_set_color(64, 0x80, 0xFF, 0x00);  // TG(2) - Verde lima
+
         // Tecla QK_BOOT en rojo (advertencia)
         rgb_matrix_set_color(14, 0xFF, 0x00, 0x00);  // QK_BOOT - Rojo
+    } else if (get_highest_layer(layer_state) == 2) {
+        // Capa 2 - Funciones de Mouse
+
+        // ESC para regresar a capa 0 en blanco
+        rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // TO(0) - Blanco
+
+        // Control de velocidad del mouse en magenta
+        rgb_matrix_set_color(1, 0xFF, 0x00, 0xFF);   // MS_ACL0 - Magenta
+        rgb_matrix_set_color(2, 0xFF, 0x00, 0xFF);   // MS_ACL1 - Magenta
+        rgb_matrix_set_color(3, 0xFF, 0x00, 0xFF);   // MS_ACL2 - Magenta
+
+        // Movimiento del cursor solo en flechas direccionales en verde claro
+        rgb_matrix_set_color(56, 0x80, 0xFF, 0x80);  // MS_UP (Flecha UP) - Verde claro
+        rgb_matrix_set_color(65, 0x80, 0xFF, 0x80);  // MS_LEFT (Flecha LEFT) - Verde claro
+        rgb_matrix_set_color(66, 0x80, 0xFF, 0x80);  // MS_DOWN (Flecha DOWN) - Verde claro
+        rgb_matrix_set_color(67, 0x80, 0xFF, 0x80);  // MS_RGHT (Flecha RIGHT) - Verde claro
+
+        // Scroll del mouse en azul claro
+        rgb_matrix_set_color(16, 0x80, 0xFF, 0xFF);  // MS_WHLU (Q) - Azul claro
+        rgb_matrix_set_color(18, 0x80, 0xFF, 0xFF);  // MS_WHLD (E) - Azul claro
+        rgb_matrix_set_color(45, 0x80, 0xFF, 0xFF);  // MS_WHLL (Z) - Azul claro
+        rgb_matrix_set_color(46, 0x80, 0xFF, 0xFF);  // MS_WHLR (X) - Azul claro
+
+        // Botones del mouse en rojo claro (ASD)
+        rgb_matrix_set_color(31, 0xFF, 0x80, 0x80);  // MS_BTN2 (A - Clic derecho) - Rojo claro
+        rgb_matrix_set_color(32, 0xFF, 0x80, 0x80);  // MS_BTN3 (S - Clic central) - Rojo claro
+        rgb_matrix_set_color(33, 0xFF, 0x80, 0x80);  // MS_BTN1 (D - Clic izquierdo) - Rojo claro
+
+        // Tecla de función TG(2) con color random/vibrante
+        rgb_matrix_set_color(63, 0xFF, 0x40, 0x80);  // TG(2) - Rosa vibrante
     }
     return true;
 }
@@ -196,21 +232,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [1] = LAYOUT_65_ansi(
-        QK_GESC,        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
+        TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
         _______,        UG_TOGG, UG_NEXT, UG_HUEU, UG_HUED, UG_SATU, UG_SATD, UG_VALU, UG_VALD, UG_SPDU, UG_SPDD, _______, _______, _______, _______,
         KC_CAPS,        RM_TOGG, RM_NEXT, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, _______, _______,  _______,         _______, _______,
         _______,                 _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
-        _______,        _______, _______,                            _______,                   _______, _______, _______, _______, KC_VOLD, _______
+        _______,        _______, _______,                            _______,                   _______, _______, TG(2),   _______, KC_VOLD, _______
     ),
     [2] = LAYOUT_65_ansi(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
-        _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______,                            _______,                   _______, _______, _______, _______, _______, _______
+        TO(0),          MS_ACL0, MS_ACL1, MS_ACL2, _______, _______, _______, _______, _______, _______, _______,  _______,  _______,  _______, _______,
+        _______,        MS_WHLU, _______, MS_WHLD, _______, _______, _______, _______, _______, _______, _______,  _______,  _______,  _______, _______,
+        _______,        MS_BTN1, MS_BTN3, MS_BTN1, _______, _______, _______, _______, _______, _______, _______,  _______,           _______, _______,
+        _______,                 MS_WHLL, MS_WHLR, _______, _______, _______, _______, _______, _______, _______, _______,  _______,  MS_UP,   _______,
+        _______,        _______, _______,                            _______,                   _______, TG(2),   _______,  MS_LEFT, MS_DOWN, MS_RGHT
     ),
     [3] = LAYOUT_65_ansi(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        TO(0),   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
