@@ -300,10 +300,12 @@ void td_N (tap_dance_state_t *state, void *user_data) {
       unregister_code(KC_LALT);
       tap_code(KC_N);
     } else {
-      // Windows: Alt Gr + n = ñ (Layout Internacional)
-      register_code(KC_RALT);  // Alt Gr
-      tap_code(KC_N);
-      unregister_code(KC_RALT);
+      // Windows: Alt + 164 (código ASCII)
+      register_code(KC_LALT);
+      tap_code(KC_KP_1);
+      tap_code(KC_KP_6);
+      tap_code(KC_KP_4);
+      unregister_code(KC_LALT);
     }
   }
 }
