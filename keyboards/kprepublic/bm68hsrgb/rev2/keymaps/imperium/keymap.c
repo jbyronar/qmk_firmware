@@ -60,7 +60,17 @@ enum {
     TD_DOWN,
     TD_LEFT,
     TD_RIGHT,
-    TD_ESC
+    TD_ESC,
+    TD_SCLN,
+    TD_QUOT,
+    TD_SLSH,
+    TD_COMM,
+    TD_DOT,
+    TD_LBRC,
+    TD_RBRC,
+    TD_MINS,
+    TD_EQL,
+    TD_SPC
 };
 
 bool is_mac_os(void) {
@@ -196,6 +206,86 @@ void td_ESC (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_SCLN (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_SCLN);
+  } else {
+    tap_code16(S(KC_SCLN)); // Shift + ; = :
+  }
+}
+
+void td_QUOT (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_QUOT);
+  } else {
+    tap_code16(S(KC_QUOT)); // Shift + ' = "
+  }
+}
+
+void td_SLSH (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_SLSH);
+  } else {
+    tap_code16(S(KC_SLSH)); // Shift + / = ?
+  }
+}
+
+void td_COMM (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_COMM);
+  } else {
+    tap_code16(S(KC_COMM)); // Shift + , = <
+  }
+}
+
+void td_DOT (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_DOT);
+  } else {
+    tap_code16(S(KC_DOT)); // Shift + . = >
+  }
+}
+
+void td_LBRC (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_LBRC);
+  } else {
+    tap_code16(S(KC_LBRC)); // Shift + [ = {
+  }
+}
+
+void td_RBRC (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_RBRC);
+  } else {
+    tap_code16(S(KC_RBRC)); // Shift + ] = }
+  }
+}
+
+void td_MINS (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_MINS);
+  } else {
+    tap_code16(S(KC_MINS)); // Shift + - = _
+  }
+}
+
+void td_EQL (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_EQL);
+  } else {
+    tap_code16(S(KC_EQL)); // Shift + = = +
+  }
+}
+
+void td_SPC (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_SPC);
+  } else {
+    tap_code16(KC_ENT); // Doble tap = Enter
+  }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -209,6 +299,16 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_LEFT);
     unregister_code (KC_RIGHT);
     unregister_code (KC_ESC);
+    unregister_code (KC_SCLN);
+    unregister_code (KC_QUOT);
+    unregister_code (KC_SLSH);
+    unregister_code (KC_COMM);
+    unregister_code (KC_DOT);
+    unregister_code (KC_LBRC);
+    unregister_code (KC_RBRC);
+    unregister_code (KC_MINS);
+    unregister_code (KC_EQL);
+    unregister_code (KC_SPC);
   }
 }
 
@@ -223,7 +323,17 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_DOWN]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_DOWN, dance_cln_reset),
     [TD_LEFT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LEFT, dance_cln_reset),
     [TD_RIGHT] = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RIGHT, dance_cln_reset),
-    [TD_ESC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_ESC, dance_cln_reset)
+    [TD_ESC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_ESC, dance_cln_reset),
+    [TD_SCLN]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SCLN, dance_cln_reset),
+    [TD_QUOT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_QUOT, dance_cln_reset),
+    [TD_SLSH]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SLSH, dance_cln_reset),
+    [TD_COMM]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_COMM, dance_cln_reset),
+    [TD_DOT]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_DOT, dance_cln_reset),
+    [TD_LBRC]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LBRC, dance_cln_reset),
+    [TD_RBRC]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_RBRC, dance_cln_reset),
+    [TD_MINS]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_MINS, dance_cln_reset),
+    [TD_EQL]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_EQL, dance_cln_reset),
+    [TD_SPC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SPC, dance_cln_reset)
 };
 
 void matrix_scan_user(void) {
@@ -279,6 +389,17 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(47, 0x00, 0xFF, 0xFF);  // C (Copiar)
         rgb_matrix_set_color(48, 0x00, 0xFF, 0xFF);  // V (Pegar)
 
+        // Categoría: Símbolos y puntuación (tap dance) - Amarillo
+        rgb_matrix_set_color(40, 0xFF, 0xFF, 0x00);  // ; (:)
+        rgb_matrix_set_color(41, 0xFF, 0xFF, 0x00);  // ' (")
+        rgb_matrix_set_color(54, 0xFF, 0xFF, 0x00);  // / (?)
+        rgb_matrix_set_color(52, 0xFF, 0xFF, 0x00);  // , (<)
+        rgb_matrix_set_color(53, 0xFF, 0xFF, 0x00);  // . (>)
+        rgb_matrix_set_color(27, 0xFF, 0xFF, 0x00);  // [ ({)
+        rgb_matrix_set_color(26, 0xFF, 0xFF, 0x00);  // ] (})
+        rgb_matrix_set_color(11, 0xFF, 0xFF, 0x00);  // - (_)
+        rgb_matrix_set_color(12, 0xFF, 0xFF, 0x00);  // = (+)
+
         // Categoría: Navegación de escritorios - Naranja
         rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
         rgb_matrix_set_color(65, 0xFF, 0x80, 0x00);  // LEFT (Escritorio izquierdo)
@@ -287,6 +408,9 @@ bool rgb_matrix_indicators_user(void) {
 
         // Categoría: Acceso a capas - Verde lima
         rgb_matrix_set_color(63, 0x80, 0xFF, 0x00);  // TG(1) - Acceso a capa de funciones
+
+        // Categoría: Barra espaciadora (space/enter) - Rosa
+        rgb_matrix_set_color(61, 0xFF, 0x80, 0xFF);  // Space (Enter) - Rosa
     } else if (get_highest_layer(layer_state) == 1) {
         // ESC para regresar a capa 0 en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // TO(0) - Blanco
@@ -387,11 +511,11 @@ bool rgb_matrix_indicators_user(void) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi(
-        TD(TD_ESC),     KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_HOME,
-        KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_PGUP,
-        KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGDN,
-        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, TD(TD_UP), KC_END,
-        KC_LCTL,        KC_LGUI, KC_LALT,                            KC_SPC,                    KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
+        TD(TD_ESC),     KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    TD(TD_MINS), TD(TD_EQL),  KC_BSPC, KC_HOME,
+        KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD(TD_LBRC), TD(TD_RBRC), KC_BSLS, KC_PGUP,
+        KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD(TD_SCLN), TD(TD_QUOT),          KC_ENT,  KC_PGDN,
+        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    KC_N,    KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
+        KC_LCTL,        KC_LGUI, KC_LALT,                            TD(TD_SPC),                KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
     ),
     [1] = LAYOUT_65_ansi(
         TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
