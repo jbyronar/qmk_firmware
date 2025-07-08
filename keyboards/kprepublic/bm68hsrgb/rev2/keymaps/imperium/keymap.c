@@ -18,7 +18,8 @@
 
 enum my_keycodes {
     Pass = SAFE_RANGE,
-    WhiteEffect
+    WhiteEffect,
+    FractalEffect
 };
 
 static void handleBoot(void);
@@ -232,7 +233,7 @@ void matrix_scan_user(void) {
             SEND_STRING(SS_TAP(X_F13));
         }
     }
-    
+
     // Cambio de color cada 1 minuto (60000ms)
     if (timer_elapsed32(color_timer) > 60000) {
         color_timer = timer_read32();
@@ -253,6 +254,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
                 rgb_matrix_sethsv_noeeprom(0, 0, 255); // HSV para blanco sólido
+            }
+            return false;
+        case FractalEffect:
+            if (record->event.pressed) {
+                rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_SPLASH);
             }
             return false;
         default:
@@ -339,6 +345,9 @@ bool rgb_matrix_indicators_user(void) {
 
         // Barra espaciadora en blanco
         rgb_matrix_set_color(61, 0xFF, 0xFF, 0xFF);  // Spacebar - Blanco
+
+        // Alt izquierdo en azul claro
+        rgb_matrix_set_color(60, 0x80, 0xFF, 0xFF);  // Alt izquierdo - Azul claro
     } else if (get_highest_layer(layer_state) == 2) {
         // Capa 2 - Funciones de Mouse
 
@@ -389,7 +398,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,        UG_TOGG, UG_NEXT, UG_HUEU, UG_HUED, UG_SATU, UG_SATD, UG_VALU, UG_VALD, UG_SPDU, UG_SPDD, _______, _______, _______, _______,
         KC_CAPS,        RM_TOGG, RM_NEXT, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, _______, _______,  _______,         _______, Pass,
         _______,                 _______, _______, _______, _______, _______, NK_TOGG, _______, _______, _______, _______, _______, KC_VOLU, _______,
-        _______,        _______, _______,                            WhiteEffect,               _______, _______, TG(2),   _______, KC_VOLD, _______
+        _______,        _______, FractalEffect,                      WhiteEffect,               _______, _______, TG(2),   _______, KC_VOLD, _______
     ),
     [2] = LAYOUT_65_ansi(
         TO(0),          MS_ACL0, MS_ACL1, MS_ACL2, _______, _______, _______, _______, _______, _______, _______,  _______,  _______,  _______, _______,
