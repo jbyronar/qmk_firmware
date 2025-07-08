@@ -23,7 +23,6 @@ enum my_keycodes {
     FractalEffect
 };
 
-static void handleBoot(void);
 static void changeRandomColor(void);
 static uint32_t key_timer_boot = 0;
 static uint32_t color_timer = 0;
@@ -31,17 +30,15 @@ uint32_t tiempo_boot = 0;
 bool is_boot_active = false;
 uint8_t random_hue = 0;
 
-void handleBoot(){
-    is_boot_active = !is_boot_active;
-    if(is_boot_active){
-        rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);
-        tiempo_boot = 60000; // 1 minuto
-        color_timer = timer_read32(); // Inicializar timer de color
-    }else{
-        rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
-        rgb_matrix_set_speed_noeeprom(50); // Velocidad más lenta para respiración
-        tiempo_boot = 0;
-    }
+void keyboard_post_init_user(void) {
+    // Activar bot automáticamente al conectar el teclado
+    is_boot_active = true;
+    tiempo_boot = 60000; // 1 minuto
+    key_timer_boot = timer_read32();
+    color_timer = timer_read32();
+    
+    // Configurar RGB para indicar bot activo
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);
 }
 
 void changeRandomColor(void) {
@@ -204,7 +201,20 @@ void td_ESC (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     register_code (KC_ESC);
   } else {
-    handleBoot();
+    // Doble tap: Bloquear pantalla específica por OS
+    if (is_mac_os()) {
+      // Mac: Control + Command + Q (Bloquear pantalla)
+      register_code(KC_LCTL);
+      register_code(KC_LGUI);
+      tap_code(KC_Q);
+      unregister_code(KC_LGUI);
+      unregister_code(KC_LCTL);
+    } else {
+      // Windows: Win + L (Bloquear)
+      register_code(KC_LGUI);
+      tap_code(KC_L);
+      unregister_code(KC_LGUI);
+    }
   }
 }
 
