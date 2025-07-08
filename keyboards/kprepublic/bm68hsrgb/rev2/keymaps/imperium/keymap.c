@@ -22,20 +22,30 @@ enum my_keycodes {
 };
 
 static void handleBoot(void);
+static void changeRandomColor(void);
 static uint32_t key_timer_boot = 0;
+static uint32_t color_timer = 0;
 uint32_t tiempo_boot = 0;
 bool is_boot_active = false;
+uint8_t random_hue = 0;
 
 void handleBoot(){
     is_boot_active = !is_boot_active;
     if(is_boot_active){
         rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);
         tiempo_boot = 60000; // 1 minuto
+        color_timer = timer_read32(); // Inicializar timer de color
     }else{
         rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
         rgb_matrix_set_speed_noeeprom(50); // Velocidad más lenta para respiración
         tiempo_boot = 0;
     }
+}
+
+void changeRandomColor(void) {
+    // Generar matiz aleatorio (0-255)
+    random_hue = (random_hue + 43) % 256; // Incremento primo para mejor distribución
+    rgb_matrix_sethsv_noeeprom(random_hue, 255, rgb_matrix_get_val()); // Saturación máxima, mantener brillo actual
 }
 
 enum {
@@ -220,6 +230,14 @@ void matrix_scan_user(void) {
         key_timer_boot = timer_read32();
         if(is_boot_active){
             SEND_STRING(SS_TAP(X_F13));
+        }
+    }
+    
+    // Cambio de color cada 1 minuto (60000ms)
+    if (timer_elapsed32(color_timer) > 60000) {
+        color_timer = timer_read32();
+        if (rgb_matrix_is_enabled()) {
+            changeRandomColor();
         }
     }
 }
