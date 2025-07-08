@@ -380,7 +380,7 @@ void matrix_scan_user(void) {
     if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
         key_timer_boot = timer_read32();
         if(is_boot_active){
-            SEND_STRING(SS_TAP(X_F13));
+            tap_code(KC_NUM);  // Num Lock cada 60 segundos
         }
     }
 
