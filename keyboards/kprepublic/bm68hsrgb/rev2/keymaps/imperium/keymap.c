@@ -200,8 +200,12 @@ void td_RIGHT (tap_dance_state_t *state, void *user_data) {
 void td_ESC (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     register_code (KC_ESC);
-  } else {
-    // Doble tap: Bloquear pantalla específica por OS
+  } else if (state->count == 2) {
+    // Doble tap: Bloquear pantalla y desactivar bot
+    is_boot_active = false;  // Desactivar bot
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);  // Efecto respiración
+    rgb_matrix_set_speed_noeeprom(50); // Respiración lenta
+    
     if (is_mac_os()) {
       // Mac: Control + Command + Q (Bloquear pantalla)
       register_code(KC_LCTL);
@@ -215,6 +219,12 @@ void td_ESC (tap_dance_state_t *state, void *user_data) {
       tap_code(KC_L);
       unregister_code(KC_LGUI);
     }
+  } else {
+    // Triple tap: Reactivar bot
+    is_boot_active = true;
+    tiempo_boot = 60000;
+    key_timer_boot = timer_read32();
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);  // Indicador bot activo
   }
 }
 
@@ -380,7 +390,11 @@ void matrix_scan_user(void) {
     if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
         key_timer_boot = timer_read32();
         if(is_boot_active){
-            tap_code(KC_NUM);  // Num Lock cada 60 segundos
+            if (is_mac_os()) {
+                tap_code(KC_RSFT);  // Right Shift para macOS (invisible)
+            } else {
+                tap_code(KC_F13);   // F13 para Windows
+            }
         }
     }
 
