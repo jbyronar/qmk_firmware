@@ -69,7 +69,10 @@ enum {
     TD_MINS,
     TD_EQL,
     TD_SPC,
-    TD_N
+    TD_N,
+    TD_LCTL,
+    TD_LALT,
+    TD_LGUI
 };
 
 bool is_mac_os(void) {
@@ -330,6 +333,50 @@ void td_N (tap_dance_state_t *state, void *user_data) {
   }
 }
 
+void td_LCTL (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_LCTL);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(A(C(KC_LEFT)));  // Mac: Ctrl+Alt+Left
+    } else {
+      tap_code16(G(KC_LEFT));  // Windows: Win+Left
+    }
+  }
+}
+
+void td_LALT (tap_dance_state_t *state, void *user_data) {
+  if (state->count == 1) {
+    register_code (KC_LALT);
+  } else {
+    if (is_mac_os()) {
+      tap_code16(A(C(KC_RIGHT)));  // Mac: Ctrl+Alt+Right
+    } else {
+      tap_code16(G(KC_RIGHT));  // Windows: Win+Right
+    }
+  }
+}
+
+void td_LGUI (tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        register_code(KC_LGUI);
+    } else if (state->count == 2) {
+        // Doble toque: Captura de área seleccionada
+        if (is_mac_os()) {
+            tap_code16(S(G(KC_4))); // Mac: Cmd+Shift+4
+        } else {
+            tap_code16(S(G(KC_S))); // Windows: Win+Shift+S
+        }
+    } else if (state->count == 3) {
+        // Triple toque: Captura de pantalla completa
+        if (is_mac_os()) {
+            tap_code16(S(G(KC_3))); // Mac: Cmd+Shift+3
+        } else {
+            tap_code16(G(KC_PSCR)); // Windows: Win+PrtScn
+        }
+    }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -354,6 +401,9 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_EQL);
     unregister_code (KC_SPC);
     unregister_code (KC_N);
+    unregister_code (KC_LCTL);
+    unregister_code (KC_LALT);
+    unregister_code (KC_LGUI);
     // Limpiar modificadores RALT específicamente
     unregister_code (KC_RALT);
     // Limpiar modificadores débiles para evitar interferencia
@@ -383,7 +433,10 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_MINS]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_MINS, dance_cln_reset),
     [TD_EQL]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_EQL, dance_cln_reset),
     [TD_SPC]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_SPC, dance_cln_reset),
-    [TD_N]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_N, dance_cln_reset)
+    [TD_N]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_N, dance_cln_reset),
+    [TD_LCTL]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LCTL, dance_cln_reset),
+    [TD_LALT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LALT, dance_cln_reset),
+    [TD_LGUI]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LGUI, dance_cln_reset)
 };
 
 void matrix_scan_user(void) {
@@ -453,7 +506,7 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(26, 0xFF, 0xFF, 0x00);  // ] (})
         rgb_matrix_set_color(11, 0xFF, 0xFF, 0x00);  // - (_)
         rgb_matrix_set_color(12, 0xFF, 0xFF, 0x00);  // = (+)
-        rgb_matrix_set_color(50, 0xFF, 0xFF, 0x00);  // N (Ñ)
+        rgb_matrix_set_color(50, 0xFF, 0x00, 0x00);  // N (Ñ) - Rojo
 
         // Categoría: Navegación de escritorios - Naranja
         rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
@@ -466,9 +519,19 @@ bool rgb_matrix_indicators_user(void) {
 
         // Categoría: Barra espaciadora (space/enter) - Rosa
         rgb_matrix_set_color(61, 0xFF, 0x80, 0xFF);  // Space (Enter) - Rosa
+
+        // Categoría: Ajuste de ventanas - Púrpura Oscuro
+        rgb_matrix_set_color(58, 0x4B, 0x00, 0x82);  // L_CTL (Ventana Derecha) - Púrpura Oscuro
+        rgb_matrix_set_color(60, 0x4B, 0x00, 0x82);  // L_ALT (Ventana Izquierda) - Púrpura Oscuro
+
+        // Categoría: Captura de pantalla - Naranja
+        rgb_matrix_set_color(59, 0xFF, 0xA5, 0x00);  // L_GUI (Captura de pantalla) - Naranja
     } else if (get_highest_layer(layer_state) == 1) {
         // ESC para regresar a capa 0 en blanco
         rgb_matrix_set_color(0, 0xFF, 0xFF, 0xFF);   // TO(0) - Blanco
+
+        // Tecla de función (Capa 1 activa)
+        rgb_matrix_set_color(63, 0x00, 0xFF, 0xFF);  // TG(1) - Cian brillante
 
         // Teclas de función F1-F12 en verde
         rgb_matrix_set_color(1, 0x00, 0xFF, 0x00);   // F1 - Verde
@@ -575,7 +638,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD(TD_LBRC), TD(TD_RBRC), KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD(TD_SCLN), TD(TD_QUOT),          KC_ENT,  KC_PGDN,
         KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    TD(TD_N), KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
-        KC_LCTL,        KC_LGUI, KC_LALT,                            TD(TD_SPC),                KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
+        TD(TD_LCTL),    TD(TD_LGUI), TD(TD_LALT),                        TD(TD_SPC),                KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
     ),
     [1] = LAYOUT_65_ansi(
         TO(0),          KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  QK_BOOT,
