@@ -36,7 +36,7 @@ void keyboard_post_init_user(void) {
     tiempo_boot = 60000; // 1 minuto
     key_timer_boot = timer_read32();
     color_timer = timer_read32();
-    
+
     // Configurar RGB para indicar bot activo
     rgb_matrix_mode_noeeprom(RGB_MATRIX_BAND_VAL);
 }
@@ -72,7 +72,9 @@ enum {
     TD_N,
     TD_LCTL,
     TD_LALT,
-    TD_LGUI
+    TD_LGUI,
+    TD_TAB,
+    TD_LSFT
 };
 
 bool is_mac_os(void) {
@@ -208,7 +210,7 @@ void td_ESC (tap_dance_state_t *state, void *user_data) {
     is_boot_active = false;  // Desactivar bot
     rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);  // Efecto respiración
     rgb_matrix_set_speed_noeeprom(50); // Respiración lenta
-    
+
     if (is_mac_os()) {
       // Mac: Control + Command + Q (Bloquear pantalla)
       register_code(KC_LCTL);
@@ -377,6 +379,22 @@ void td_LGUI (tap_dance_state_t *state, void *user_data) {
     }
 }
 
+void td_TAB (tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        register_code(KC_TAB);
+    } else {
+        tap_code16(S(KC_TAB)); // Shift+Tab para devolver tabulación
+    }
+}
+
+void td_LSFT (tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        register_code(KC_LSFT);
+    } else {
+        tap_code16(KC_DEL); // Segunda función: Suprimir/Delete
+    }
+}
+
 void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
   if (state->count == 1) {
     unregister_code (KC_C);
@@ -404,6 +422,8 @@ void dance_cln_reset (tap_dance_state_t *state, void *user_data) {
     unregister_code (KC_LCTL);
     unregister_code (KC_LALT);
     unregister_code (KC_LGUI);
+    unregister_code (KC_TAB);
+    unregister_code (KC_LSFT);
     // Limpiar modificadores RALT específicamente
     unregister_code (KC_RALT);
     // Limpiar modificadores débiles para evitar interferencia
@@ -436,7 +456,9 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_N]     = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_N, dance_cln_reset),
     [TD_LCTL]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LCTL, dance_cln_reset),
     [TD_LALT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LALT, dance_cln_reset),
-    [TD_LGUI]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LGUI, dance_cln_reset)
+    [TD_LGUI]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LGUI, dance_cln_reset),
+    [TD_TAB]   = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_TAB, dance_cln_reset),
+    [TD_LSFT]  = ACTION_TAP_DANCE_FN_ADVANCED (NULL, td_LSFT, dance_cln_reset)
 };
 
 void matrix_scan_user(void) {
@@ -507,6 +529,12 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(11, 0xFF, 0xFF, 0x00);  // - (_)
         rgb_matrix_set_color(12, 0xFF, 0xFF, 0x00);  // = (+)
         rgb_matrix_set_color(50, 0xFF, 0x00, 0x00);  // N (Ñ) - Rojo
+
+        // Categoría: Navegación de documentos - Violeta
+        rgb_matrix_set_color(15, 0x8A, 0x2B, 0xE2);  // TAB (Shift+TAB) - Violeta
+
+        // Categoría: Acción destructiva - Magenta oscuro
+        rgb_matrix_set_color(44, 0x8B, 0x00, 0x8B);  // L_SHIFT (Delete) - Magenta oscuro
 
         // Categoría: Navegación de escritorios - Naranja
         rgb_matrix_set_color(56, 0xFF, 0x80, 0x00);  // UP (Mission Control/Task View)
@@ -635,9 +663,9 @@ bool rgb_matrix_indicators_user(void) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi(
         TD(TD_ESC),     KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    TD(TD_MINS), TD(TD_EQL),  KC_BSPC, KC_HOME,
-        KC_TAB,         KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD(TD_LBRC), TD(TD_RBRC), KC_BSLS, KC_PGUP,
+        TD(TD_TAB),     KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD(TD_LBRC), TD(TD_RBRC), KC_BSLS, KC_PGUP,
         KC_CAPS,      TD(TD_A), TD(TD_S), KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD(TD_SCLN), TD(TD_QUOT),          KC_ENT,  KC_PGDN,
-        KC_LSFT,      TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    TD(TD_N), KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
+        TD(TD_LSFT),  TD(TD_Z), TD(TD_X),TD(TD_C),TD(TD_V), KC_B,    TD(TD_N), KC_M,    TD(TD_COMM), TD(TD_DOT),  TD(TD_SLSH), KC_RSFT, TD(TD_UP), KC_END,
         TD(TD_LCTL),    TD(TD_LGUI), TD(TD_LALT),                        TD(TD_SPC),                KC_RALT, TG(1),   KC_RCTL, TD(TD_LEFT), TD(TD_DOWN), TD(TD_RIGHT)
     ),
     [1] = LAYOUT_65_ansi(
